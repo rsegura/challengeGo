@@ -19,7 +19,7 @@ func SetupRouter() *gin.Engine {
 	// Get user value
 	r.GET("/user/:name", user.GetValueByName)
 
-	r.GET("/users", user.GetUsers)
+	r.GET("/users", user.GetPokemons)
 
 	// Authorized group (uses gin.BasicAuth() middleware)
 	// Same than:
