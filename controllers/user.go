@@ -5,54 +5,9 @@ import (
 	"net/http"
 	"log"
 	"io/ioutil"
-	"sort"
 	"encoding/json"
 	"encoding/xml"
-	"challenge/models"
 )
-
-type result struct {
-	index string
-	res   http.Response
-	err   error
-}
-
-type MRData struct{
-	XMLName xml.Name `xml:"MRData"`
-	Series string `xml:"series,attr"`
-	Url string `xml:"url,attr"`
-	Limit string `xml:"limit,attr"`
-	Total string `xml:"total,attr"`
-	Drivers []Users
-}
-
-type Users struct{
-	XMLName xml.Name `xml:"DriverTable"`
-	Users []User  `xml:"Driver"`
-}
-
-type User struct{
-	XMLName xml.Name `xml:"Driver"`
-	DriverId string `xml:"driverId,attr"`
-	Url string	`xml:"url,attr"`
-	GivenName string `xml:"GivenName"`
-	FamilyName string `xml:"FamilyName"`
-	DateOfBirth string `xml:"DateOfBirth"`
-	Nationality string `xml:"Nationality"`
-}
-
-type Driver struct {
-	XMLName xml.Name `xml:"Driver"`
-	GivenName string `xml:"Driver>GivenName"`
-	FamilyName string `xml:"Driver>FamilyName"`
-	DateOfBirth string `xml:"Driver>DateOfBirth"`
-	Nationality string `xml:"Driver>Nationality"`
-}
-
-
-type UserController struct{}
-
-var userModel = new(models.User)
 
 func (u UserController) GetPing(c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{"value": "pong"})
@@ -145,89 +100,23 @@ func (u UserController) GetPokemons(c *gin.Context){
 	return
 }
 
-func getJson(url string, target interface{})  (interface{}, error){
+func getJson(url string, target interface{})  error{
 
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
-		return nil, err
+		return err
 	}
 	binaryResponse, err := ioutil.ReadAll(res.Body)
 	res.Body.Close()
 	if err != nil{
 		log.Fatal(err)
-		return nil, err
+		return err
 	}
 	jsonErr := json.Unmarshal(binaryResponse, &target)
 	if jsonErr != nil {
 		log.Fatal(err)
-		return nil, err
+		return err
 	}
-	return target, nil
-}
-
-func boundedParallelGet(urls map[string]string, concurrencyLimit int) []result {
-
-	// this buffered channel will block at the concurrency limit
-	semaphoreChan := make(chan struct{}, concurrencyLimit)
-
-	// this channel will not block and collect the http request results
-	resultsChan := make(chan *result)
-
-	// make sure we close these channels when we're done with them
-	defer func() {
-		close(semaphoreChan)
-		close(resultsChan)
-	}()
-
-	// keen an index and loop through every url we will send a request to
-	for key, url := range urls {
-
-		// start a go routine with the index and url in a closure
-		go func(key string, url string) {
-
-			// this sends an empty struct into the semaphoreChan which
-			// is basically saying add one to the limit, but when the
-			// limit has been reached block until there is room
-			semaphoreChan <- struct{}{}
-
-			// send the request and put the response in a result struct
-			// along with the index so we can sort them later along with
-			// any error that might have occoured
-			res, err := http.Get(url)
-			result := &result{key, *res, err}
-
-			// now we can send the result struct through the resultsChan
-			resultsChan <- result
-
-			// once we're done it's we read from the semaphoreChan which
-			// has the effect of removing one from the limit and allowing
-			// another goroutine to start
-			<-semaphoreChan
-
-		}(key, url)
-	}
-
-	// make a slice to hold the results we're expecting
-	var results []result
-
-	// start listening for any results over the resultsChan
-	// once we get a result append it to the result slice
-	for {
-		result := <-resultsChan
-		results = append(results, *result)
-
-		// if we've reached the expected amount of urls then stop
-		if len(results) == len(urls) {
-			break
-		}
-	}
-
-	// let's sort these results real quick
-	sort.Slice(results, func(i, j int) bool {
-		return results[i].index < results[j].index
-	})
-
-	// now we're done we return the results
-	return results
+	return nil
 }

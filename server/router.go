@@ -5,6 +5,7 @@ import (
 	"challenge/controllers"
 )
 
+
 func SetupRouter() *gin.Engine {
 	// Disable Console Color
 	// gin.DisableConsoleColor()
@@ -19,7 +20,11 @@ func SetupRouter() *gin.Engine {
 	// Get user value
 	r.GET("/user/:name", user.GetValueByName)
 
-	r.GET("/users", user.GetPokemons)
+	r.GET("/pokemons", user.GetAllPokemons)
+	r.GET("/clash", user.GetAllClash)
+	r.GET("/clash/:id", user.GetClash)
+	r.GET("/pokemon/:id", user.GetPokemon)
+	r.GET("/elements",user.GetAllValues)
 
 	// Authorized group (uses gin.BasicAuth() middleware)
 	// Same than:
