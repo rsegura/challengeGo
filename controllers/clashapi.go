@@ -14,7 +14,7 @@ type Clash struct {
 }
 
 
-func(u UserController) GetAllClash(c *gin.Context){
+func(u *Handler) GetAllClash(c *gin.Context){
 	var data []interface{}
 	jsonErr := getJson("http://www.clashapi.xyz/api/cards", &data)
 	if jsonErr != nil {
@@ -27,7 +27,7 @@ func(u UserController) GetAllClash(c *gin.Context){
 	return
 }
 
-func(u UserController) GetClash(c *gin.Context){
+func(u *Handler) GetClash(c *gin.Context){
 	id := c.Params.ByName("id")
 	var data Clash
 	jsonErr := getJson("http://www.clashapi.xyz/api/cards/"+id, &data)

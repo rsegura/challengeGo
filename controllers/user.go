@@ -9,12 +9,12 @@ import (
 	"encoding/xml"
 )
 
-func (u UserController) GetPing(c *gin.Context){
+func (u *Handler) GetPing(c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{"value": "pong"})
 	return
 }
 
-func (u UserController) GetValueByName(c *gin.Context){
+/*func (u *Handler) GetValueByName(c *gin.Context){
 	user := c.Params.ByName("name")
 	value, ok := userModel.GetByName(user)
 	if ok != nil {
@@ -30,7 +30,7 @@ func (u UserController) GetValueByName(c *gin.Context){
 	return
 }
 
-func (u UserController) GetUsers(c *gin.Context){
+func (u *Handler) GetUsers(c *gin.Context){
 	
 	value, ok := userModel.GetAll()
 	if ok != nil {
@@ -42,9 +42,9 @@ func (u UserController) GetUsers(c *gin.Context){
 	}
 		
 	return
-}
+}*/
 
-func (u UserController) GetPokemons(c *gin.Context){
+func (u *Handler) GetPokemons(c *gin.Context){
 	var urls []string
 	mapsUrls := make(map[string]string)
 	mapsUrls["pokemon"] = "https://pokeapi.co/api/v2/pokemon?limit=10000"

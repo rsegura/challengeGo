@@ -8,7 +8,6 @@ import (
 	"sort"
 	"encoding/json"
 	"encoding/xml"
-	"challenge/models"
 )
 
 type result struct {
@@ -52,9 +51,8 @@ type Driver struct {
 
 type UserController struct{}
 
-var userModel = new(models.User)
 
-func (u UserController) GetAllValues(c *gin.Context){
+func (u *Handler) GetAllValues(c *gin.Context){
 	
 	mapsUrls := make(map[string]string)
 	mapsUrls["pokemon"] = "https://pokeapi.co/api/v2/pokemon?limit=10000"

@@ -6,7 +6,7 @@ import(
 	"net/http"
 )
 
-func(u UserController) GetAllPokemons(c *gin.Context){
+func(u *Handler) GetAllPokemons(c *gin.Context){
 	var data interface{}
 	jsonErr := getJson("https://pokeapi.co/api/v2/pokemon?limit=10000", &data)
 	if jsonErr != nil {
@@ -19,7 +19,7 @@ func(u UserController) GetAllPokemons(c *gin.Context){
 	return
 }
 
-func(u UserController) GetPokemon(c *gin.Context){
+func(u *Handler) GetPokemon(c *gin.Context){
 	id := c.Params.ByName("id")
 	var data interface{}
 	jsonErr := getJson("https://pokeapi.co/api/v2/pokemon/"+id, &data)

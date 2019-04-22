@@ -12,19 +12,20 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
-	user := new(controllers.UserController)
-
+	h, _:=controllers.NewHandler()
+	
+	//user := new(controllers.UserController)
 	// Ping test
-	r.GET("/ping", user.GetPing)
+	r.GET("/ping", h.GetPing)
 
 	// Get user value
-	r.GET("/user/:name", user.GetValueByName)
+	//r.GET("/user/:name", h.GetValueByName)
 
-	r.GET("/pokemons", user.GetAllPokemons)
-	r.GET("/clash", user.GetAllClash)
-	r.GET("/clash/:id", user.GetClash)
-	r.GET("/pokemon/:id", user.GetPokemon)
-	r.GET("/elements",user.GetAllValues)
+	r.GET("/pokemons", h.GetAllPokemons)
+	r.GET("/clash", h.GetAllClash)
+	r.GET("/clash/:id", h.GetClash)
+	r.GET("/pokemon/:id", h.GetPokemon)
+	r.GET("/elements",h.GetAllValues)
 
 	// Authorized group (uses gin.BasicAuth() middleware)
 	// Same than:
