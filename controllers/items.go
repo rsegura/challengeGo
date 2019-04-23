@@ -17,39 +17,50 @@ type result struct {
 }
 
 type MRData struct{
-	XMLName xml.Name `xml:"MRData"`
-	Series string `xml:"series,attr"`
-	Url string `xml:"url,attr"`
-	Limit string `xml:"limit,attr"`
-	Total string `xml:"total,attr"`
-	Drivers []Users
+	XMLName xml.Name `xml:"MRData" json:"-"`
+	Series string `xml:"series,attr" json:"series"`
+	Url string `xml:"url,attr" json:"url"`
+	Limit string `xml:"limit,attr" json:"limit"`
+	Total string `xml:"total,attr" json:"total"`
+	DriversList []Driver `xml:"DriverTable>Driver" json:"drivers"`
 }
 
-type Users struct{
-	XMLName xml.Name `xml:"DriverTable"`
-	Users []User  `xml:"Driver"`
-}
-
-type User struct{
-	XMLName xml.Name `xml:"Driver"`
-	DriverId string `xml:"driverId,attr"`
-	Url string	`xml:"url,attr"`
-	GivenName string `xml:"GivenName"`
-	FamilyName string `xml:"FamilyName"`
-	DateOfBirth string `xml:"DateOfBirth"`
-	Nationality string `xml:"Nationality"`
-}
-
-type Driver struct {
-	XMLName xml.Name `xml:"Driver"`
-	GivenName string `xml:"Driver>GivenName"`
-	FamilyName string `xml:"Driver>FamilyName"`
-	DateOfBirth string `xml:"Driver>DateOfBirth"`
-	Nationality string `xml:"Driver>Nationality"`
+type Driver struct{
+	XMLName xml.Name `xml:"Driver" json:"-"`
+	DriverId string `xml:"driverId,attr" json:"driverId"`
+	Url string	`xml:"url,attr" json:"url"`
+	GivenName string `xml:"GivenName" json:"givenName"`
+	FamilyName string `xml:"FamilyName" json:"familyName"`
+	DateOfBirth string `xml:"DateOfBirth" json:"dateOfBirth"`
+	Nationality string `xml:"Nationality" json:"nationality"`
 }
 
 
-type UserController struct{}
+type UserController struct{
+
+}
+
+type pokemonRequest struct{
+	Count int `json:"count"`
+	Next int `json:"next"`
+	Previous int `json:"previous"`	
+	Results []struct{
+		Name string `json:"name"`
+		Url string `json:"url"`
+	} `json:"results"`
+}
+
+type cardsRequest struct{
+	Arena int `json:"arena"`
+	CopyId int `json:"copyId"`
+	Description string `json:"description"`
+	ElixirCost int `json:"elixirCost"`
+	IdName string `json:"idName"`
+	Name string `json:"name"`
+	Order int `json:"order"`
+	Rarity string `json:"rarity"`
+	Type string `json:"type"`
+}
 
 
 func (u *Handler) GetAllValues(c *gin.Context){
@@ -60,8 +71,8 @@ func (u *Handler) GetAllValues(c *gin.Context){
 	mapsUrls["drivers"] = "http://ergast.com/api/f1/drivers?limit=847"
 	
 	results := boundedParallelGet(mapsUrls, 3)
-	var data interface{} // Pokemons
-	var doc []interface{} //cards
+	var data pokemonRequest // Pokemons try to change this to struct in order to use real data types
+	var doc []cardsRequest //cards   same
 	var users MRData //drivers
     var jsonErr error
 	for responseIndex := range results {
