@@ -62,6 +62,12 @@ type cardsRequest struct{
 	Type string `json:"type"`
 }
 
+type AllValues struct {
+	Pokemons pokemonRequest
+	Cards []cardsRequest
+	Drivers MRData
+}
+
 
 func (u *Handler) GetAllValues(c *gin.Context){
 	
@@ -102,10 +108,60 @@ func (u *Handler) GetAllValues(c *gin.Context){
 		c.Abort()
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{"user": users, "pokemons": data, "cards":doc})
 	return
 }
+
+func (u *HandlerWithoutFramework) GetAllValues(w http.ResponseWriter, req *http.Request){
+	
+	mapsUrls := make(map[string]string)
+	mapsUrls["pokemon"] = "https://pokeapi.co/api/v2/pokemon?limit=10000"
+	mapsUrls["cards"] = "http://www.clashapi.xyz/api/cards"
+	mapsUrls["drivers"] = "http://ergast.com/api/f1/drivers?limit=847"
+	
+	results := boundedParallelGet(mapsUrls, 3)
+	var data pokemonRequest // Pokemons try to change this to struct in order to use real data types
+	var doc []cardsRequest //cards   same
+	var users MRData //drivers
+    var jsonErr error
+	for responseIndex := range results {
+		binaryResponse, err := ioutil.ReadAll(results[responseIndex].res.Body)
+		if results[responseIndex].index == "pokemon"{
+		
+			log.Println(results[responseIndex].index)
+			jsonErr = json.Unmarshal(binaryResponse, &data)
+		}
+		if results[responseIndex].index == "cards" {
+			log.Println(results[responseIndex].index)
+			jsonErr = json.Unmarshal(binaryResponse, &doc)
+		} else{
+			xml.Unmarshal(binaryResponse, &users)
+			
+			
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+		
+		
+	}
+	if jsonErr != nil {
+		log.Fatal(jsonErr)
+		http.Error(w, jsonErr.Error(), http.StatusInternalServerError)
+		return
+	}
+	allValues := AllValues{
+		Pokemons : data,
+		Cards: doc,
+		Drivers: users,
+	}
+	jsonData, _ :=json.Marshal(allValues)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
+	return
+}
+
+
 
 func boundedParallelGet(urls map[string]string, concurrencyLimit int) []result {
 

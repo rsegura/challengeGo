@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	
+	"net/http"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,5 +22,27 @@ type Handler struct {
 
 func NewHandler() (HandlerInterface, error) {
 	return &Handler{
+	}, nil
+}
+
+
+type HandlerWithoutFrameworkInterface interface{
+	GetPing(w http.ResponseWriter, req *http.Request)
+	GetAllPokemons(w http.ResponseWriter, req *http.Request)
+	GetAllValues(w http.ResponseWriter, req *http.Request)
+	/*GetPokemons()
+	GetAllValues()
+	GetAllPokemons()
+	GetPokemon()
+	GetAllClash()
+	GetClash()*/
+}
+
+type HandlerWithoutFramework struct {
+	
+}
+
+func NewHandlerWithoutFramework() (HandlerWithoutFrameworkInterface, error) {
+	return &HandlerWithoutFramework{
 	}, nil
 }
