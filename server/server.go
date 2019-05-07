@@ -18,6 +18,7 @@ func Init(){
 
 	r := SetupRouterWithoutFramework()
 	amw := authenticationMiddleware{}
+	amw.tokenUsers = make(map[string]string)
 	amw.Populate()
 	r.Use(amw.Middleware)
 	r.Use(loggingMiddleware)
@@ -38,7 +39,7 @@ func loggingMiddleware(next http.Handler) http.Handler {
 
 // Initialize it somewhere
 func (amw *authenticationMiddleware) Populate() {
-	amw.tokenUsers = make(map[string]string)
+	
 	amw.tokenUsers["00000000"] = "user0"
 	amw.tokenUsers["aaaaaaaa"] = "userA"
 	amw.tokenUsers["05f717e5"] = "randomUser"
