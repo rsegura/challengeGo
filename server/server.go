@@ -1,29 +1,32 @@
 package server
 
 import (
-	"challenge/config"
 	"net/http"
 	"log"
+	"github.com/gorilla/mux"
 )
 // Define our struct
 type authenticationMiddleware struct {
 	tokenUsers map[string]string
 }
 
-func Init(){
-	log.Println("Init Server")
-	config := config.GetConfig()
-	/*r :=SetupRouter()
-	r.Run(config.GetString("server.port"))*/
+type App struct{
+	Router *mux.Router
+}
 
-	r := SetupRouterWithoutFramework()
+func(a *App) Init(){
+	log.Println("Init Server")
+	a.Router = mux.NewRouter()
+	a.SetupRouterWithoutFramework()
 	amw := authenticationMiddleware{}
 	amw.tokenUsers = make(map[string]string)
 	amw.Populate()
-	r.Use(amw.Middleware)
-	r.Use(loggingMiddleware)
+	//a.Router.Use(amw.Middleware)
+	a.Router.Use(loggingMiddleware)
+}
 
-	http.ListenAndServe(config.GetString("server.port"), r)
+func (a *App) Run(addr string){
+	log.Fatal(http.ListenAndServe(addr, a.Router))
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {

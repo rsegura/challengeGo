@@ -5,7 +5,7 @@ import (
 	//"net/http"
 	"challenge/controllers"
 	"log"
-	"github.com/gorilla/mux"
+	//"github.com/gorilla/mux"
 )
 
 
@@ -59,17 +59,11 @@ func SetupRouter() *gin.Engine {
 	return r
 }
 
-func SetupRouterWithoutFramework() *mux.Router{
+func(a *App) SetupRouterWithoutFramework(){
 	log.Println("On SetupRouterWithoutFramework")
 	h, _:=controllers.NewHandlerWithoutFramework()
-
-	newMux := mux.NewRouter()
-
-	newMux.HandleFunc("/ping", h.GetPing)
-	newMux.HandleFunc("/pokemons", h.GetAllPokemons)
-	newMux.HandleFunc("/pokemon/{id}", h.GetPokemon)
-	newMux.HandleFunc("/all", h.GetAllValues)
-
-	return newMux
-
+	a.Router.HandleFunc("/ping", h.GetPing)
+	a.Router.HandleFunc("/pokemons", h.GetAllPokemons)
+	a.Router.HandleFunc("/pokemon/{id}", h.GetPokemon)
+	a.Router.HandleFunc("/all", h.GetAllValues)
 }

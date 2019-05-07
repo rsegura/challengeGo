@@ -27,7 +27,7 @@ func(u *Handler) GetAllPokemons(c *gin.Context){
 }
 
 func(u *HandlerWithoutFramework) GetAllPokemons(w http.ResponseWriter, req *http.Request){
-	var data interface{}
+	var data pokemonRequest
 	jsonErr := getJson("https://pokeapi.co/api/v2/pokemon?limit=10000", &data)
 	js, _ :=json.Marshal(data)
 	if jsonErr != nil {
