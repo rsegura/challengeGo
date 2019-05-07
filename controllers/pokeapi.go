@@ -5,6 +5,7 @@ import(
 	"log"
 	"net/http"
 	"encoding/json"
+	"github.com/gorilla/mux"
 )
 
 type ErrorProfile struct{
@@ -50,5 +51,21 @@ func(u *Handler) GetPokemon(c *gin.Context){
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"pokemons": data})
+	return
+}
+
+func(u *HandlerWithoutFramework) GetPokemon(w http.ResponseWriter, req *http.Request){
+	vars := mux.Vars(req)
+	id :=vars["id"] // the pokemon Id
+	var data interface{}
+	jsonErr := getJson("https://pokeapi.co/api/v2/pokemon/"+id, &data)
+	js, _ :=json.Marshal(data)
+	if jsonErr != nil {
+		log.Fatal(jsonErr)
+		http.Error(w, jsonErr.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 	return
 }

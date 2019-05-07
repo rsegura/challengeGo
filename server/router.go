@@ -2,9 +2,10 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
+	//"net/http"
 	"challenge/controllers"
 	"log"
+	"github.com/gorilla/mux"
 )
 
 
@@ -58,14 +59,15 @@ func SetupRouter() *gin.Engine {
 	return r
 }
 
-func SetupRouterWithoutFramework() *http.ServeMux{
+func SetupRouterWithoutFramework() *mux.Router{
 	log.Println("On SetupRouterWithoutFramework")
 	h, _:=controllers.NewHandlerWithoutFramework()
 
-	newMux := http.NewServeMux()
+	newMux := mux.NewRouter()
 
 	newMux.HandleFunc("/ping", h.GetPing)
 	newMux.HandleFunc("/pokemons", h.GetAllPokemons)
+	newMux.HandleFunc("/pokemon/{id}", h.GetPokemon)
 	newMux.HandleFunc("/all", h.GetAllValues)
 
 	return newMux
